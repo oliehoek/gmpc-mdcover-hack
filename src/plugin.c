@@ -164,7 +164,7 @@ int fetch_cover_art_path(mpd_Song *song, gchar **path)
 	}
 	/* check for image with name "cover" */
 	regex_t regt;
-	if(!regcomp(&regt,"(voorkant|front|cover|large)", REG_EXTENDED|REG_ICASE))
+	if(!regcomp(&regt,"(voorkant|front|cover|large|folder)", REG_EXTENDED|REG_ICASE))
 	{                                                                	
 		do{
 			char *data = node->data;
