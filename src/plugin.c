@@ -9,7 +9,7 @@
 #include <libmpd/debug_printf.h>
 
 void init();
-int fetch_get_image(mpd_Song *song,MpdDataType type, char **path);
+int fetch_get_image(mpd_Song *song,MetaDataType type, char **path);
 
 void music_dir_cover_art_pref_construct(GtkWidget *container);
 void music_dir_cover_art_pref_destroy(GtkWidget *container);
@@ -67,7 +67,7 @@ int fetch_cover_priority()
 	return cfg_get_single_value_as_int_with_default(config, "music-dir-cover", "priority", 10);
 }
 
-int fetch_get_image(mpd_Song *song,MpdDataType type, char **path)
+int fetch_get_image(mpd_Song *song,MetaDataType type, char **path)
 {
 	if(song  == NULL || song->file == NULL)
 	{
@@ -217,7 +217,7 @@ void fetch_cover_art_path_list_from_dir(gchar *url, GList **list)
 GList * fetch_cover_art_path_list(mpd_Song *song) 
 {
 	char *url =NULL;
-	const char *musicroot = NULL;
+	gchar *musicroot = NULL;
 	char *dirname = NULL;
 	GList *list = NULL;
 	GDir *dir = NULL;
