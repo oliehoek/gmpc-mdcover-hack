@@ -39,6 +39,7 @@ gmpcPlugin plugin = {
 	0,
 	NULL, /* path  */
 	init, /* init  */
+        NULL, /* destroy */
 	NULL, /* browser */
 	NULL, /* status changed */
 	NULL, /* connection changed */
