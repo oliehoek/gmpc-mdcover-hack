@@ -13,8 +13,8 @@ PKG_CHECK_MODULES([gmpcmdca],[	glib-2.0 >= 2.4
 	gmodule-2.0
 	libxml-2.0
 	gthread-2.0
-	libmpd >= 0.12.0
-	gmpc	>= 0.12.1
+	libmpd >= 0.12.99
+	gmpc	>= 0.13.99
 ])
 
 
