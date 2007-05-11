@@ -1,6 +1,6 @@
 AC_INIT(src)
 AM_CONFIG_HEADER([config.h])
-AM_INIT_AUTOMAKE([gmpc-mdcover], [0.14.0],qball@qballcow.nl)
+AM_INIT_AUTOMAKE([gmpc-mdcover], [0.14.95],qball@qballcow.nl)
 
 AC_PROG_CC
 AM_DISABLE_STATIC
