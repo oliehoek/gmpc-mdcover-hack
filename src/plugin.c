@@ -48,7 +48,7 @@ int plugin_api_version = PLUGIN_API_VERSION;
 /* the plugin */
 gmpcPlugin plugin = {
 	"Music Dir Fetcher",
-	{0,14,97},
+	{0,15,0},
 	GMPC_PLUGIN_META_DATA,
 	0,
 	NULL, /* path  */
