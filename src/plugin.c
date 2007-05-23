@@ -88,21 +88,24 @@ int fetch_get_image(mpd_Song *song,MetaDataType type, char **path)
 					if(song->file)
 					{
 						gchar *musicroot= cfg_get_single_value_as_string(config, "music-dir-cover", "musicroot");
-						gchar *file = g_malloc0((strlen(musicroot)+strlen(song->file)+strlen("lyrics")+2)*sizeof(*file));
-						int length = strlen(song->file);
-						strcat(file, musicroot);
-						g_free(musicroot);
-						strcat(file, G_DIR_SEPARATOR_S);
-						for(;length > 0 && song->file[length] != '.';length--);
-						strncat(file, song->file, length+1);
-						strcat(file, "lyric");	
-						if(g_file_test(	file, G_FILE_TEST_EXISTS))
+						if(musicroot)
 						{
-							*path = file;
+							gchar *file = g_malloc0((strlen(musicroot)+strlen(song->file)+strlen("lyrics")+2)*sizeof(*file));
+							int length = strlen(song->file);
+							strcat(file, musicroot);
+							g_free(musicroot);
+							strcat(file, G_DIR_SEPARATOR_S);
+							for(;length > 0 && song->file[length] != '.';length--);
+							strncat(file, song->file, length+1);
+							strcat(file, "lyric");	
+							if(g_file_test(	file, G_FILE_TEST_EXISTS))
+							{
+								*path = file;
 
-							return META_DATA_AVAILABLE;
+								return META_DATA_AVAILABLE;
+							}
+							g_free(file);
 						}
-						g_free(file);
 						return META_DATA_UNAVAILABLE;
 					}
 
