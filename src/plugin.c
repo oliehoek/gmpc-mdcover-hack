@@ -66,108 +66,101 @@ gmpcPlugin plugin = {
 
 int fetch_get_image(mpd_Song *song,MetaDataType type, char **path)
 {
-				if(song  == NULL || song->file == NULL)
-				{
-								return META_DATA_UNAVAILABLE;
-				}
-				if(type == META_ALBUM_ART)
-				{
-								int retv = fetch_cover_art_path(song,path);
-								if(retv == META_DATA_AVAILABLE)
-								{
-												return META_DATA_AVAILABLE;
-								}
-								else
-								{
-												if(*path) g_free(*path);
-												return META_DATA_UNAVAILABLE;
-								}
-				}
-				else if(type == META_SONG_TXT)
-				{
-					if(song->file)
-					{
-						gchar *musicroot= cfg_get_single_value_as_string(config, "music-dir-cover", "musicroot");
-						if(musicroot)
-						{
-							gchar *file = g_malloc0((strlen(musicroot)+strlen(song->file)+strlen("lyrics")+2)*sizeof(*file));
-							int length = strlen(song->file);
-							strcat(file, musicroot);
-							g_free(musicroot);
-							strcat(file, G_DIR_SEPARATOR_S);
-							for(;length > 0 && song->file[length] != '.';length--);
-							strncat(file, song->file, length+1);
-							strcat(file, "lyric");	
-							if(g_file_test(	file, G_FILE_TEST_EXISTS))
-							{
-								*path = file;
+	if(song  == NULL || song->file == NULL)
+	{
+		return META_DATA_UNAVAILABLE;
+	}
+	if(type == META_ALBUM_ART)
+	{
+		int retv = fetch_cover_art_path(song,path);
+		if(retv == META_DATA_AVAILABLE)
+		{
+			return META_DATA_AVAILABLE;
+		}
+		if(*path) g_free(*path);
+		return META_DATA_UNAVAILABLE;
+	}
+	else if(type == META_SONG_TXT)
+	{
+		gchar *musicroot= cfg_get_single_value_as_string(config, "music-dir-cover", "musicroot");
+		if(musicroot)
+		{
+			gchar *file = g_malloc0((strlen(musicroot)+strlen(song->file)+strlen("lyrics")+2)*sizeof(*file));
+			int length = strlen(song->file);
+			strcat(file, musicroot);
+			g_free(musicroot);
+			strcat(file, G_DIR_SEPARATOR_S);
+			for(;length > 0 && song->file[length] != '.';length--);
+			strncat(file, song->file, length+1);
+			strcat(file, "lyric");	
+			if(g_file_test(	file, G_FILE_TEST_EXISTS))
+			{
+				*path = file;
 
-								return META_DATA_AVAILABLE;
-							}
-							g_free(file);
-						}
-						return META_DATA_UNAVAILABLE;
-					}
-
-				}
-				else if(type == META_ARTIST_ART || type == META_ARTIST_TXT|| type == META_ALBUM_TXT)
-				{
-					char *extention = NULL;
-					char *name = NULL;
-					switch(type)
+				return META_DATA_AVAILABLE;
+			}
+			g_free(file);
+		}
+		return META_DATA_UNAVAILABLE;
+	}
+	else if(type == META_ARTIST_ART || type == META_ARTIST_TXT|| type == META_ALBUM_TXT)
+	{
+		char *extention = NULL;
+		char *name = NULL;
+		switch(type)
+		{
+			case META_ARTIST_TXT:
+				name = "BIOGRAPHY";
+				extention = "";
+				break;
+			case META_ALBUM_TXT:
+				name = song->album;
+				extention = ".txt";
+				break;
+			default:
+				name = song->artist;
+				extention = ".jpg";
+				break;
+		}
+		if(song->artist)
+		{
+			gchar *musicroot= cfg_get_single_value_as_string(config, "music-dir-cover", "musicroot");
+			gchar **dirs = NULL;
+			gchar *fpath = NULL;
+			gchar *song_path = NULL;
+			int i = 0;
+			if(!musicroot) return META_DATA_UNAVAILABLE;
+			song_path = g_path_get_dirname(song->file);
+			for(i=strlen(song_path); i >= 0 && *path == NULL;i--)
+			{
+				if(song_path[i] == G_DIR_SEPARATOR)
+				{	
+					song_path[i] = '\0';
+					fpath = g_strdup_printf("%s%c%s%c%s%s",
+							musicroot, G_DIR_SEPARATOR,
+							song_path, G_DIR_SEPARATOR,
+							name,
+							extention);
+					if(g_file_test(	fpath, G_FILE_TEST_EXISTS))
 					{
-						case META_ARTIST_TXT:
-							name = "BIOGRAPHY";
-							extention = "";
-							break;
-						case META_ALBUM_TXT:
-							name = song->album;
-							extention = ".txt";
-							break;
-						default:
-							name = song->artist;
-							extention = ".jpg";
-							break;
+						*path = fpath;
 					}
-					if(song->artist)
+					else
 					{
-						gchar *musicroot= cfg_get_single_value_as_string(config, "music-dir-cover", "musicroot");
-						gchar **dirs = NULL;
-						gchar *fpath = NULL;
-						gchar *song_path = NULL;
-						int i = 0;
-						if(!musicroot) return META_DATA_UNAVAILABLE;
-						song_path = g_path_get_dirname(song->file);
-						for(i=strlen(song_path); i >= 0 && *path == NULL;i--)
-						{
-							if(song_path[i] == G_DIR_SEPARATOR)
-							{	
-								song_path[i] = '\0';
-								fpath = g_strdup_printf("%s%c%s%c%s%s",
-										musicroot, G_DIR_SEPARATOR,
-										song_path, G_DIR_SEPARATOR,
-										name,
-										extention);
-								if(g_file_test(	fpath, G_FILE_TEST_EXISTS))
-								{
-									*path = fpath;
-								}
-								else
-								{
-									g_free(fpath);
-								}
-							}
-						}
-						g_free(song_path);
-						cfg_free_string(musicroot);
-						if(*path)
-						{
-							return META_DATA_AVAILABLE;
-						}
+						g_free(fpath);
 					}
 				}
+			}
+			g_free(song_path);
+			cfg_free_string(musicroot);
+			if(*path)
+			{
+				return META_DATA_AVAILABLE;
+			}
+		}
+	}
 
-				return META_DATA_UNAVAILABLE;
+	return META_DATA_UNAVAILABLE;
 }
 
 int fetch_cover_art_path(mpd_Song *song, gchar **path)
@@ -195,8 +188,9 @@ int fetch_cover_art_path(mpd_Song *song, gchar **path)
 			}
 		}while((node = g_list_next(node)));
 	}
-	*path = g_strdup(list->data);
 	regfree(&regt);
+	*path = g_strdup(list->data);
+	
 	g_list_foreach(list, (GFunc)g_free,NULL);
 	g_list_free(list);	
 	return META_DATA_AVAILABLE;
@@ -306,8 +300,8 @@ GList * fetch_cover_art_path_list(mpd_Song *song)
 			g_free(new_dir);
 		}
 	}
-
-
+	regfree(&regt);
+	
 
 	g_free(dirname);
 	cfg_free_string(musicroot);
