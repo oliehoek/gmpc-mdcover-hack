@@ -209,7 +209,7 @@ void fetch_cover_art_path_list_from_dir(gchar *url, GList **list)
 			filename = g_dir_read_name(dir);
 			do{
 				/* ignore . files */
-				if(filename[0] != '.' || !strncmp(filename, ".folder",7))
+				if(filename[0] != '.' || !strncmp(filename, ".folder.jpg",strlen(".folder.jpg")))
 				{
 					if(!regexec(&regt, filename, 0,NULL,0))	
 					{
