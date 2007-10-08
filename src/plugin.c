@@ -172,9 +172,9 @@ int fetch_cover_art_path(mpd_Song *song, gchar **path)
 	{
 		return META_DATA_UNAVAILABLE;
 	}
-	/* check for image with name "cover/voorkant/front/large/folder" */
+	/* check for image with name "cover/voorkant/front/large/folder/booklet" */
 	regex_t regt;
-	if(!regcomp(&regt,"(voorkant|front|cover|large|folder)", REG_EXTENDED|REG_ICASE))
+	if(!regcomp(&regt,"(voorkant|front|cover|large|folder|booklet)", REG_EXTENDED|REG_ICASE))
 	{                                                                	
 		do{
 			char *data = node->data;
