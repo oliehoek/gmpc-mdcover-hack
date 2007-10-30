@@ -1,6 +1,6 @@
 AC_INIT(src)
 AM_CONFIG_HEADER([config.h])
-AM_INIT_AUTOMAKE([gmpc-mdcover], [0.15.1],qball@sarine.nl)
+AM_INIT_AUTOMAKE([gmpc-mdcover], [0.15.4.99],qball@sarine.nl)
 
 AC_PROG_CC
 AM_DISABLE_STATIC
@@ -13,8 +13,8 @@ PKG_CHECK_MODULES([gmpcmdca],[	glib-2.0 >= 2.10
 	gmodule-2.0
 	libxml-2.0
 	gthread-2.0
-	libmpd >= 0.14.0
-	gmpc	>= 0.15.0
+	libmpd >= 0.14.99
+	gmpc	>= 0.15.4.99
 ])
 
 
