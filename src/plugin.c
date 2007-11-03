@@ -7,6 +7,7 @@
 #include <gmpc/plugin.h>
 #include <libmpd/libmpd.h>
 #include <libmpd/debug_printf.h>
+#include <config.h>
 
 int fetch_get_image(mpd_Song *song,MetaDataType type, char **path);
 
@@ -47,20 +48,13 @@ gmpcMetaDataPlugin mdca_cover = {
 int plugin_api_version = PLUGIN_API_VERSION;
 /* the plugin */
 gmpcPlugin plugin = {
-	"Music Dir Fetcher",
-	{0,15,0},
-	GMPC_PLUGIN_META_DATA,
-	0,
-	NULL, /* path  */
-	NULL, /* init  */
-	NULL, /* destroy */
-	NULL, /* browser */
-	NULL, /* status changed */
-	NULL, /* connection changed */
-	&mdca_pref, /* preferences */
-	&mdca_cover, /* meta data */
-	mdca_get_enabled,
-	mdca_set_enabled
+	.name           = "Music Dir Fetcher",
+	.version        = {PLUGIN_MAJOR_VERSION,PLUGIN_MINOR_VERSION,PLUGIN_MICRO_VERSION},
+	.plugin_type    = GMPC_PLUGIN_META_DATA,
+	.pref           = &mdca_pref, /* preferences */
+	.metadata       = &mdca_cover, /* meta data */
+	.get_enabled    = mdca_get_enabled,
+	.set_enabled    = mdca_set_enabled
 };
 
 
