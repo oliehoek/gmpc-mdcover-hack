@@ -1,5 +1,4 @@
-#bin_PROGRAMS=osdplugin_la
-libdir=${prefix}/share/gmpc/plugins/
+libdir=${prefix}/lib/gmpc/plugins/
 
 lib_LTLIBRARIES = mdcaplugin.la
 
