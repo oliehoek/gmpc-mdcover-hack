@@ -164,6 +164,7 @@ int fetch_cover_art_path(mpd_Song *song, gchar **path)
 	*path = NULL;
 	if(list == NULL)
 	{
+        debug_printf(DEBUG_INFO, "No images available\n");
 		return META_DATA_UNAVAILABLE;
 	}
 	/* check for image with name "cover/voorkant/front/large/folder/booklet" */
@@ -230,10 +231,12 @@ GList * fetch_cover_art_path_list(mpd_Song *song)
 
 	if(song == NULL || !cfg_get_single_value_as_int_with_default(config, "music-dir-cover", "enable", TRUE))
 	{
+        debug_printf(DEBUG_INFO, "Plugin is disabled\n");
 		return NULL;
 	}
 	if(song->file == NULL )
 	{
+        debug_printf(DEBUG_INFO, "The song does not contain path info\n");
 		return NULL;
 	}
 
@@ -276,6 +279,7 @@ GList * fetch_cover_art_path_list(mpd_Song *song)
 			musicroot,
 			dirname
 			);
+    debug_printf(DEBUG_INFO, "Looking into: '%s'\n", url);
 	fetch_cover_art_path_list_from_dir(url, &list);
 	g_free(url);
 
