@@ -1,6 +1,6 @@
 m4_define([plugin_major_version], [0])
 m4_define([plugin_minor_version], [15])
-m4_define([plugin_micro_version], [5])
+m4_define([plugin_micro_version], [98])
 m4_define([plugin_version],[plugin_major_version.plugin_minor_version.plugin_micro_version])
 
 AC_INIT(src)
@@ -22,8 +22,8 @@ PKG_CHECK_MODULES([gmpcmdca],[	glib-2.0 >= 2.10
 	gmodule-2.0
 	libxml-2.0
 	gthread-2.0
-	libmpd >= 0.14.99
-	gmpc	>= 0.15.4.102
+	libmpd >= 0.15.98
+	gmpc	>= 0.15.98
 ])
 
 
