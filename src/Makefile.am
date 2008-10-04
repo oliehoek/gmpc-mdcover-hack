@@ -1,6 +1,6 @@
-libdir=${prefix}/lib/gmpc/plugins/
+plugindir=${libdir}/gmpc/plugins/
 
-lib_LTLIBRARIES = mdcaplugin.la
+plugin_LTLIBRARIES = mdcaplugin.la
 
 mdcaplugin_la_SOURCES=	\
 	plugin.c 
