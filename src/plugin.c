@@ -18,6 +18,10 @@ int fetch_cover_art_path(mpd_Song *song, gchar **path);
 static GtkWidget *wp_pref_vbox = NULL;
 
 
+
+/**
+ * Required functions
+ */
 /*
  * Enable/Disable state of the plugins
  */
@@ -39,29 +43,7 @@ static void fetch_cover_priority_set(int priority)
 {
     cfg_set_single_value_as_int(config, "music-dir-cover", "priority", priority);
 }
-/* Plugin structure(s) */ 
-gmpcPrefPlugin mdca_pref = {
-	.construct = music_dir_cover_art_pref_construct,
-	.destroy = music_dir_cover_art_pref_destroy
-};
 
-gmpcMetaDataPlugin mdca_cover = {
-	.get_priority = fetch_cover_priority,
-    .set_priority = fetch_cover_priority_set,
-	.get_image = fetch_get_image
-};
-/* a workaround so gmpc has some sort of api checking */
-int plugin_api_version = PLUGIN_API_VERSION;
-/* the plugin */
-gmpcPlugin plugin = {
-	.name           = "Music Dir Fetcher",
-	.version        = {PLUGIN_MAJOR_VERSION,PLUGIN_MINOR_VERSION,PLUGIN_MICRO_VERSION},
-	.plugin_type    = GMPC_PLUGIN_META_DATA,
-	.pref           = &mdca_pref, /* preferences */
-	.metadata       = &mdca_cover, /* meta data */
-	.get_enabled    = mdca_get_enabled,
-	.set_enabled    = mdca_set_enabled
-};
 
 
 int fetch_get_image(mpd_Song *song,MetaDataType type, char **path)
@@ -152,7 +134,7 @@ int fetch_get_image(mpd_Song *song,MetaDataType type, char **path)
 				}
 			}
 			g_free(song_path);
-			cfg_free_string(musicroot);
+			g_free(musicroot);
 			if(*path)
 			{
 				return META_DATA_AVAILABLE;
@@ -357,3 +339,32 @@ void music_dir_cover_art_pref_construct(GtkWidget *container)
 
 	gtk_widget_show_all(container);
 }
+
+
+
+/* Plugin structure(s) */ 
+gmpcPrefPlugin mdca_pref = {
+	.construct = music_dir_cover_art_pref_construct,
+	.destroy = music_dir_cover_art_pref_destroy
+};
+
+gmpcMetaDataPlugin mdca_cover = {
+	.get_priority = fetch_cover_priority,
+    .set_priority = fetch_cover_priority_set,
+	.get_image = fetch_get_image
+};
+/* a workaround so gmpc has some sort of api checking */
+int plugin_api_version = PLUGIN_API_VERSION;
+/* the plugin */
+gmpcPlugin plugin = {
+	.name           = "Music Dir Fetcher",
+	.version        = {PLUGIN_MAJOR_VERSION,PLUGIN_MINOR_VERSION,PLUGIN_MICRO_VERSION},
+	.plugin_type    = GMPC_PLUGIN_META_DATA,
+	.pref           = &mdca_pref, /* preferences */
+	.metadata       = &mdca_cover, /* meta data */
+	.get_enabled    = mdca_get_enabled,
+	.set_enabled    = mdca_set_enabled
+};
+
+
+
