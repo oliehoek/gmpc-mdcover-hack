@@ -32,17 +32,23 @@ static void mdca_set_enabled(int enabled)
 /* priority */
 static int fetch_cover_priority()
 {
-				return cfg_get_single_value_as_int_with_default(config, "music-dir-cover", "priority", 10);
+    return cfg_get_single_value_as_int_with_default(config, "music-dir-cover", "priority", 10);
+}
+
+static void fetch_cover_priority_set(int priority)
+{
+    cfg_set_single_value_as_int(config, "music-dir-cover", "priority", priority);
 }
 /* Plugin structure(s) */ 
 gmpcPrefPlugin mdca_pref = {
-	music_dir_cover_art_pref_construct,
-	music_dir_cover_art_pref_destroy
+	.construct = music_dir_cover_art_pref_construct,
+	.destroy = music_dir_cover_art_pref_destroy
 };
 
 gmpcMetaDataPlugin mdca_cover = {
-	fetch_cover_priority,
-	fetch_get_image
+	.get_priority = fetch_cover_priority,
+    .set_priority = fetch_cover_priority_set,
+	.get_image = fetch_get_image
 };
 /* a workaround so gmpc has some sort of api checking */
 int plugin_api_version = PLUGIN_API_VERSION;
