@@ -3,9 +3,10 @@ m4_define([plugin_minor_version], [16])
 m4_define([plugin_micro_version], [0])
 m4_define([plugin_version],[plugin_major_version.plugin_minor_version.plugin_micro_version])
 
-AC_INIT(src)
+AC_INIT([gmpc-mdcover], [plugin_version],qball@sarine.nl)
+AC_CONFIG_AUX_DIR([.])
 AM_CONFIG_HEADER([config.h])
-AM_INIT_AUTOMAKE([gmpc-mdcover], [plugin_version],qball@sarine.nl)
+AM_INIT_AUTOMAKE
 
 AC_DEFINE(PLUGIN_MAJOR_VERSION, plugin_major_version, ["Major version of plugin"])
 AC_DEFINE(PLUGIN_MINOR_VERSION, plugin_minor_version, ["Minor version of plugin"])
