@@ -1,9 +1,9 @@
+AC_INIT([gmpc-mdcover], [package_version], [qball@sarine.nl])
 m4_define([package_major_version], [0])
 m4_define([package_minor_version], [16])
-m4_define([package_micro_version], [5])
+m4_define([package_micro_version], [95])
 m4_define([package_version],[package_major_version.package_minor_version.package_micro_version])
 
-AC_INIT([gmpc-mdcover], [package_version],qball@sarine.nl)
 AC_CONFIG_AUX_DIR([.])
 AM_CONFIG_HEADER([config.h])
 AM_INIT_AUTOMAKE
