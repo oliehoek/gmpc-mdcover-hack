@@ -314,11 +314,6 @@ GList * fetch_cover_art_path_list(mpd_Song *song)
 }
 
 
-void music_dir_cover_art_enable_toggle(GtkWidget *wid)
-{
-	int kk = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(wid));
-	cfg_set_single_value_as_int(config, "music-dir-cover", "enable", kk);
-}
 void music_dir_cover_art_pref_destroy(GtkWidget *container)
 {
 	gtk_container_remove(GTK_CONTAINER(container), wp_pref_vbox);
@@ -334,16 +329,10 @@ static void info_entry_edited(GtkWidget *entry)
 
 void music_dir_cover_art_pref_construct(GtkWidget *container)
 {
-	GtkWidget *enable_cg = gtk_check_button_new_with_mnemonic("_Enable mpd's music dir as cover art source");
-	GtkWidget *entry = NULL;
+	GtkWidget *entry = NULL, *label = NULL;
 	char *entry_str = cfg_get_single_value_as_string(config, "music-dir-cover", "musicroot");
 	wp_pref_vbox = gtk_vbox_new(FALSE,6);
 
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(enable_cg), 	
-			cfg_get_single_value_as_int_with_default(config, "music-dir-cover", "enable", TRUE));
-
-	g_signal_connect(G_OBJECT(enable_cg), "toggled", G_CALLBACK(music_dir_cover_art_enable_toggle), NULL);
-	gtk_box_pack_start(GTK_BOX(wp_pref_vbox), enable_cg, FALSE, FALSE, 0);
 	gtk_container_add(GTK_CONTAINER(container), wp_pref_vbox);
 
 	entry = gtk_entry_new();
@@ -352,7 +341,9 @@ void music_dir_cover_art_pref_construct(GtkWidget *container)
 		gtk_entry_set_text(GTK_ENTRY(entry), entry_str);
 		cfg_free_string(entry_str);
 	}
-	gtk_box_pack_start(GTK_BOX(wp_pref_vbox), gtk_label_new("Music Root:"), FALSE, FALSE,0);
+    label = gtk_label_new("Music root:");
+    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+	gtk_box_pack_start(GTK_BOX(wp_pref_vbox), label, FALSE, FALSE,0);
 	gtk_box_pack_start(GTK_BOX(wp_pref_vbox), entry, FALSE, FALSE,0);
 	g_signal_connect(G_OBJECT(entry), "changed", G_CALLBACK(info_entry_edited), NULL);
 
