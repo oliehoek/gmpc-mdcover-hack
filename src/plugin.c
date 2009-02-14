@@ -220,7 +220,7 @@ void fetch_cover_art_path_list_from_dir(gchar *url, GList **list)
 					if(!regexec(&regt, filename, 0,NULL,0))	
 					{
 						char *path = g_strdup_printf("%s%c%s", url,G_DIR_SEPARATOR,filename);
-                        debug_printf(DEBUG_ERROR, "MDCOVER found image %s\n", path);
+                        debug_printf(DEBUG_INFO, "MDCOVER found image %s\n", path);
 						*list = g_list_append(*list, path);
 					}
 				}
