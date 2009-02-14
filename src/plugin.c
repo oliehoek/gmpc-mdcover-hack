@@ -69,6 +69,7 @@ int fetch_get_image(mpd_Song *song,MetaDataType type, char **path)
 {
 	if(song  == NULL || song->file == NULL)
 	{
+        debug_printf(DEBUG_INFO, "MDCOVER:  No file path to look at.");
 		return META_DATA_UNAVAILABLE;
 	}
 	if(type == META_ALBUM_ART)
@@ -76,9 +77,12 @@ int fetch_get_image(mpd_Song *song,MetaDataType type, char **path)
 		int retv = fetch_cover_art_path(song,path);
 		if(retv == META_DATA_AVAILABLE)
 		{
+            debug_printf(DEBUG_INFO, "MDCOVER: Found cover: %s\n",*path);
 			return META_DATA_AVAILABLE;
 		}
-		if(*path) g_free(*path);
+
+        debug_printf(DEBUG_INFO, "MDCOVER: no cover found: \n");
+        if(*path) g_free(*path);
 		return META_DATA_UNAVAILABLE;
 	}
 	else if(type == META_SONG_TXT)
@@ -216,6 +220,7 @@ void fetch_cover_art_path_list_from_dir(gchar *url, GList **list)
 					if(!regexec(&regt, filename, 0,NULL,0))	
 					{
 						char *path = g_strdup_printf("%s%c%s", url,G_DIR_SEPARATOR,filename);
+                        debug_printf(DEBUG_ERROR, "MDCOVER found image %s\n", path);
 						*list = g_list_append(*list, path);
 					}
 				}
