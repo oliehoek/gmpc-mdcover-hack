@@ -20,6 +20,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <gtk/gtk.h>
+#include <config.h>
+#include <glib.h>
+#include <glib/gi18n-lib.h>
 #include <regex.h>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
@@ -346,7 +349,7 @@ void music_dir_cover_art_pref_construct(GtkWidget *container)
 		gtk_entry_set_text(GTK_ENTRY(entry), entry_str);
 		cfg_free_string(entry_str);
 	}
-    label = gtk_label_new("Music root:");
+    label = gtk_label_new(_("Music root:"));
     gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
 	gtk_box_pack_start(GTK_BOX(wp_pref_vbox), label, FALSE, FALSE,0);
 	gtk_box_pack_start(GTK_BOX(wp_pref_vbox), entry, FALSE, FALSE,0);
@@ -370,15 +373,27 @@ gmpcMetaDataPlugin mdca_cover = {
 };
 /* a workaround so gmpc has some sort of api checking */
 int plugin_api_version = PLUGIN_API_VERSION;
+
+void mdcover_init(void)
+{
+	bindtextdomain(GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
+	bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+}
+static const gchar *mdcover_get_translation_domain(void)
+{
+    return GETTEXT_PACKAGE;
+}
 /* the plugin */
 gmpcPlugin plugin = {
-	.name           = "Music Dir Fetcher",
+	.name           = N_("Music Dir Fetcher"),
 	.version        = {PLUGIN_MAJOR_VERSION,PLUGIN_MINOR_VERSION,PLUGIN_MICRO_VERSION},
 	.plugin_type    = GMPC_PLUGIN_META_DATA,
+    .init           = mdcover_init,
 	.pref           = &mdca_pref, /* preferences */
 	.metadata       = &mdca_cover, /* meta data */
 	.get_enabled    = mdca_get_enabled,
-	.set_enabled    = mdca_set_enabled
+	.set_enabled    = mdca_set_enabled,
+    .get_translation_domain = mdcover_get_translation_domain
 };
 
 

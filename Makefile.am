@@ -1,3 +1,3 @@
 AUTOMAKE_OPTIONS = foreign 1.6
 
-SUBDIRS = src 
+SUBDIRS = src po 
