@@ -31,12 +31,11 @@
 #include <libmpd/debug_printf.h>
 #include <config.h>
 
-int fetch_get_image(mpd_Song *song,MetaDataType type, char **path);
-
+int fetch_get_image(mpd_Song *song,MetaDataType type,void (*callback)(GList *uris, gpointer data), gpointer data) ;
 void music_dir_cover_art_pref_construct(GtkWidget *container);
 void music_dir_cover_art_pref_destroy(GtkWidget *container);
 GList * fetch_cover_art_path_list(mpd_Song *song);
-int fetch_cover_art_path(mpd_Song *song, gchar **path);
+GList * fetch_cover_art_path(mpd_Song *song);
 static GtkWidget *wp_pref_vbox = NULL;
 
 
@@ -68,8 +67,9 @@ static void fetch_cover_priority_set(int priority)
 
 
 
-int fetch_get_image(mpd_Song *song,MetaDataType type, char **path)
+int fetch_get_image(mpd_Song *song,MetaDataType type,void (*callback)(GList *uris, gpointer data), gpointer data) 
 {
+    gchar *path = NULL;
 	if(song  == NULL || song->file == NULL)
 	{
         debug_printf(DEBUG_INFO, "MDCOVER:  No file path to look at.");
@@ -77,15 +77,8 @@ int fetch_get_image(mpd_Song *song,MetaDataType type, char **path)
 	}
 	if(type == META_ALBUM_ART)
 	{
-		int retv = fetch_cover_art_path(song,path);
-		if(retv == META_DATA_AVAILABLE)
-		{
-            debug_printf(DEBUG_INFO, "MDCOVER: Found cover: %s\n",*path);
-			return META_DATA_AVAILABLE;
-		}
-
-        debug_printf(DEBUG_INFO, "MDCOVER: no cover found: \n");
-        if(*path) g_free(*path);
+		GList *retv = fetch_cover_art_path(song);
+        callback(retv, data);
 		return META_DATA_UNAVAILABLE;
 	}
 	else if(type == META_SONG_TXT)
@@ -93,6 +86,7 @@ int fetch_get_image(mpd_Song *song,MetaDataType type, char **path)
 		gchar *musicroot= cfg_get_single_value_as_string(config, "music-dir-cover", "musicroot");
 		if(musicroot)
 		{
+            GList *list;
 			gchar *file = g_malloc0((strlen(musicroot)+strlen(song->file)+strlen("lyrics")+2)*sizeof(*file));
 			int length = strlen(song->file);
 			strcat(file, musicroot);
@@ -103,12 +97,15 @@ int fetch_get_image(mpd_Song *song,MetaDataType type, char **path)
 			strcat(file, "lyric");	
 			if(g_file_test(	file, G_FILE_TEST_EXISTS))
 			{
-				*path = file;
+				path = file;
+                list = g_list_append(list, file);
+                callback(list, data);
 
 				return META_DATA_AVAILABLE;
 			}
 			g_free(file);
 		}
+        callback(NULL, data);
 		return META_DATA_UNAVAILABLE;
 	}
 	else if(type == META_ARTIST_ART || type == META_ARTIST_TXT|| type == META_ALBUM_TXT)
@@ -132,6 +129,7 @@ int fetch_get_image(mpd_Song *song,MetaDataType type, char **path)
 		}
 		if(song->artist)
 		{
+            GList *list = NULL;
 			gchar *musicroot= cfg_get_single_value_as_string(config, "music-dir-cover", "musicroot");
 			gchar **dirs = NULL;
 			gchar *fpath = NULL;
@@ -139,7 +137,7 @@ int fetch_get_image(mpd_Song *song,MetaDataType type, char **path)
 			int i = 0;
 			if(!musicroot) return META_DATA_UNAVAILABLE;
 			song_path = g_path_get_dirname(song->file);
-			for(i=strlen(song_path); i >= 0 && *path == NULL;i--)
+			for(i=strlen(song_path); i >= 0 && path == NULL;i--)
 			{
 				if(song_path[i] == G_DIR_SEPARATOR)
 				{	
@@ -151,7 +149,7 @@ int fetch_get_image(mpd_Song *song,MetaDataType type, char **path)
 							extention);
 					if(g_file_test(	fpath, G_FILE_TEST_EXISTS))
 					{
-						*path = fpath;
+						path = fpath;
 					}
 					else
 					{
@@ -161,27 +159,32 @@ int fetch_get_image(mpd_Song *song,MetaDataType type, char **path)
 			}
 			g_free(song_path);
 			g_free(musicroot);
-			if(*path)
+			if(path)
 			{
+
+                list = g_list_append(list, path);
+                callback(list, data);
 				return META_DATA_AVAILABLE;
 			}
 		}
 	}
 
-	return META_DATA_UNAVAILABLE;
+    callback(NULL, data);
+    return META_DATA_UNAVAILABLE;
 }
 
-int fetch_cover_art_path(mpd_Song *song, gchar **path)
+GList * fetch_cover_art_path(mpd_Song *song)
 {
 	GList *list = NULL, *node = NULL;	
 	node = list = fetch_cover_art_path_list(song);
-	*path = NULL;
 	if(list == NULL)
 	{
         debug_printf(DEBUG_INFO, "No images available\n");
-		return META_DATA_UNAVAILABLE;
+		return NULL;
 	}
+    return list;
 	/* check for image with name "cover/voorkant/front/large/folder/booklet" */
+    /*
 	regex_t regt;
 	if(!regcomp(&regt,"(voorkant|front|cover|large|folder|booklet)", REG_EXTENDED|REG_ICASE))
 	{                                                                	
@@ -203,6 +206,7 @@ int fetch_cover_art_path(mpd_Song *song, gchar **path)
 	g_list_foreach(list, (GFunc)g_free,NULL);
 	g_list_free(list);	
 	return META_DATA_AVAILABLE;
+    */
 }
 
 void fetch_cover_art_path_list_from_dir(gchar *url, GList **list)
@@ -369,7 +373,7 @@ gmpcPrefPlugin mdca_pref = {
 gmpcMetaDataPlugin mdca_cover = {
 	.get_priority = fetch_cover_priority,
     .set_priority = fetch_cover_priority_set,
-	.get_image = fetch_get_image
+	.get_uris = fetch_get_image
 };
 /* a workaround so gmpc has some sort of api checking */
 int plugin_api_version = PLUGIN_API_VERSION;
