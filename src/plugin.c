@@ -73,6 +73,7 @@ int fetch_get_image(mpd_Song *song,MetaDataType type,void (*callback)(GList *uri
 	if(song  == NULL || song->file == NULL)
 	{
         debug_printf(DEBUG_INFO, "MDCOVER:  No file path to look at.");
+        callback(NULL, data);
 		return META_DATA_UNAVAILABLE;
 	}
 	if(type == META_ALBUM_ART)
