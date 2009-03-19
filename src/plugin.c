@@ -136,7 +136,10 @@ int fetch_get_image(mpd_Song *song,MetaDataType type,void (*callback)(GList *uri
 			gchar *fpath = NULL;
 			gchar *song_path = NULL;
 			int i = 0;
-			if(!musicroot) return META_DATA_UNAVAILABLE;
+			if(!musicroot){
+                callback(NULL, data);
+                return META_DATA_UNAVAILABLE;
+            }
 			song_path = g_path_get_dirname(song->file);
 			for(i=strlen(song_path); i >= 0 && path == NULL;i--)
 			{
