@@ -27,6 +27,7 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <gmpc/plugin.h>
+#include <gmpc/metadata.h>
 #include <libmpd/libmpd.h>
 #include <libmpd/debug_printf.h>
 #include <config.h>
@@ -38,7 +39,7 @@ GList * fetch_cover_art_path_list(mpd_Song *song);
 GList * fetch_cover_art_path(mpd_Song *song);
 static GtkWidget *wp_pref_vbox = NULL;
 
-
+gmpcPlugin plugin;
 
 /**
  * Required functions
@@ -98,8 +99,13 @@ int fetch_get_image(mpd_Song *song,MetaDataType type,void (*callback)(GList *uri
 			strcat(file, "lyric");	
 			if(g_file_test(	file, G_FILE_TEST_EXISTS))
 			{
-				path = file;
-                list = g_list_append(list, file);
+                MetaData *md = meta_data_new();
+                md->type = type;
+                md->plugin_name = plugin.name; 
+                md->content_type = META_DATA_CONTENT_URI;
+				md->content = file;
+                md->size = 0;
+                list = g_list_append(list, md);
                 callback(list, data);
 
 				return META_DATA_AVAILABLE;
@@ -165,8 +171,13 @@ int fetch_get_image(mpd_Song *song,MetaDataType type,void (*callback)(GList *uri
 			g_free(musicroot);
 			if(path)
 			{
-
-                list = g_list_append(list, path);
+                MetaData *md = meta_data_new();
+                md->type = type;
+                md->plugin_name = plugin.name; 
+                md->content_type = META_DATA_CONTENT_URI;
+				md->content = path;
+                md->size = 0;
+                list = g_list_append(list, md);
                 callback(list, data);
 				return META_DATA_AVAILABLE;
 			}
@@ -229,11 +240,17 @@ void fetch_cover_art_path_list_from_dir(gchar *url, GList **list)
 				if(filename[0] != '.' || !strncmp(filename, ".folder.jpg",strlen(".folder.jpg")))
 				{
 					if(!regexec(&regt, filename, 0,NULL,0))	
-					{
-						char *path = g_strdup_printf("%s%c%s", url,G_DIR_SEPARATOR,filename);
+                    {
+                        char *path = g_strdup_printf("%s%c%s", url,G_DIR_SEPARATOR,filename);
+                        MetaData *md = meta_data_new();
+                        md->type = META_ALBUM_ART;
+                        md->plugin_name = plugin.name; 
+                        md->content_type = META_DATA_CONTENT_URI;
+                        md->content = path;
+                        md->size = 0;
                         debug_printf(DEBUG_INFO, "MDCOVER found image %s\n", path);
-						*list = g_list_append(*list, path);
-					}
+                        *list = g_list_append(*list, md);
+                    }
 				}
 				filename = g_dir_read_name(dir);
 			}while(filename);
@@ -292,7 +309,14 @@ GList * fetch_cover_art_path_list(mpd_Song *song)
 		g_free(album);
 		if(g_file_test(url, G_FILE_TEST_EXISTS))
 		{
-			list = g_list_append(list, url);	
+            MetaData *md = meta_data_new();
+            md->type = META_ALBUM_ART;
+            md->plugin_name = plugin.name; 
+            md->content_type = META_DATA_CONTENT_URI;
+            md->content = url;
+            md->size = 0;
+
+			list = g_list_append(list, md);	
 		}
 		else g_free(url);
 	}
@@ -377,7 +401,7 @@ gmpcPrefPlugin mdca_pref = {
 gmpcMetaDataPlugin mdca_cover = {
 	.get_priority = fetch_cover_priority,
     .set_priority = fetch_cover_priority_set,
-	.get_uris = fetch_get_image
+	.get_metadata = fetch_get_image
 };
 /* a workaround so gmpc has some sort of api checking */
 int plugin_api_version = PLUGIN_API_VERSION;
