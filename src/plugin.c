@@ -85,14 +85,13 @@ int fetch_get_image(mpd_Song *song,MetaDataType type,void (*callback)(GList *uri
 	}
 	else if(type == META_SONG_TXT)
 	{
-		gchar *musicroot= cfg_get_single_value_as_string(config, "music-dir-cover", "musicroot");
+		const gchar *musicroot= connection_get_music_directory();
 		if(musicroot)
 		{
             GList *list;
 			gchar *file = g_malloc0((strlen(musicroot)+strlen(song->file)+strlen("lyrics")+2)*sizeof(*file));
 			int length = strlen(song->file);
 			strcat(file, musicroot);
-			g_free(musicroot);
 			strcat(file, G_DIR_SEPARATOR_S);
 			for(;length > 0 && song->file[length] != '.';length--);
 			strncat(file, song->file, length+1);
@@ -137,7 +136,7 @@ int fetch_get_image(mpd_Song *song,MetaDataType type,void (*callback)(GList *uri
 		if(song->artist)
 		{
             GList *list = NULL;
-			gchar *musicroot= cfg_get_single_value_as_string(config, "music-dir-cover", "musicroot");
+			const gchar *musicroot= connection_get_music_directory();
 			gchar **dirs = NULL;
 			gchar *fpath = NULL;
 			gchar *song_path = NULL;
@@ -168,7 +167,6 @@ int fetch_get_image(mpd_Song *song,MetaDataType type,void (*callback)(GList *uri
 				}
 			}
 			g_free(song_path);
-			g_free(musicroot);
 			if(path)
 			{
                 MetaData *md = meta_data_new();
@@ -262,10 +260,10 @@ void fetch_cover_art_path_list_from_dir(gchar *url, GList **list)
 GList * fetch_cover_art_path_list(mpd_Song *song) 
 {
 	char *url =NULL;
-	gchar *musicroot = NULL;
 	char *dirname = NULL;
 	GList *list = NULL;
 	GDir *dir = NULL;
+	const gchar *musicroot= connection_get_music_directory();
 	regex_t regt;
 
 
@@ -280,7 +278,6 @@ GList * fetch_cover_art_path_list(mpd_Song *song)
 		return NULL;
 	}
 
-	musicroot= cfg_get_single_value_as_string(config, "music-dir-cover", "musicroot");
 	if(musicroot == NULL)
 	{
 		debug_printf(DEBUG_WARNING, "No Music Root");
@@ -290,7 +287,6 @@ GList * fetch_cover_art_path_list(mpd_Song *song)
 	if(dirname == NULL)
 	{
 		debug_printf(DEBUG_WARNING, "Cannot get file's directory name");
-		cfg_free_string(musicroot);
 		return NULL;
 	}	
 	if(song->album)
@@ -349,54 +345,9 @@ GList * fetch_cover_art_path_list(mpd_Song *song)
 	
 
 	g_free(dirname);
-	cfg_free_string(musicroot);
 	return g_list_first(list);
 }
 
-
-void music_dir_cover_art_pref_destroy(GtkWidget *container)
-{
-	gtk_container_remove(GTK_CONTAINER(container), wp_pref_vbox);
-}
-static void info_entry_edited(GtkWidget *entry)
-{
-	const char *str = gtk_entry_get_text(GTK_ENTRY(entry));
-	if(str)
-	{
-		cfg_set_single_value_as_string(config, "music-dir-cover", "musicroot",(char *)str);
-	}
-}
-
-void music_dir_cover_art_pref_construct(GtkWidget *container)
-{
-	GtkWidget *entry = NULL, *label = NULL;
-	char *entry_str = cfg_get_single_value_as_string(config, "music-dir-cover", "musicroot");
-	wp_pref_vbox = gtk_vbox_new(FALSE,6);
-
-	gtk_container_add(GTK_CONTAINER(container), wp_pref_vbox);
-
-	entry = gtk_entry_new();
-	if(entry_str)
-	{
-		gtk_entry_set_text(GTK_ENTRY(entry), entry_str);
-		cfg_free_string(entry_str);
-	}
-    label = gtk_label_new(_("Music root:"));
-    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
-	gtk_box_pack_start(GTK_BOX(wp_pref_vbox), label, FALSE, FALSE,0);
-	gtk_box_pack_start(GTK_BOX(wp_pref_vbox), entry, FALSE, FALSE,0);
-	g_signal_connect(G_OBJECT(entry), "changed", G_CALLBACK(info_entry_edited), NULL);
-
-	gtk_widget_show_all(container);
-}
-
-
-
-/* Plugin structure(s) */ 
-gmpcPrefPlugin mdca_pref = {
-	.construct = music_dir_cover_art_pref_construct,
-	.destroy = music_dir_cover_art_pref_destroy
-};
 
 gmpcMetaDataPlugin mdca_cover = {
 	.get_priority = fetch_cover_priority,
@@ -421,7 +372,6 @@ gmpcPlugin plugin = {
 	.version        = {PLUGIN_MAJOR_VERSION,PLUGIN_MINOR_VERSION,PLUGIN_MICRO_VERSION},
 	.plugin_type    = GMPC_PLUGIN_META_DATA,
     .init           = mdcover_init,
-	.pref           = &mdca_pref, /* preferences */
 	.metadata       = &mdca_cover, /* meta data */
 	.get_enabled    = mdca_get_enabled,
 	.set_enabled    = mdca_set_enabled,
