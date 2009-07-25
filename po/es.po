@@ -1,4 +1,4 @@
-# German translation for gmpc
+# Spanish translation for gmpc
 # Copyright (c) 2009 Rosetta Contributors and Canonical Ltd 2009
 # This file is distributed under the same license as the gmpc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2009.
@@ -8,9 +8,9 @@ msgstr ""
 "Project-Id-Version: gmpc\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2009-03-17 20:03+0100\n"
-"PO-Revision-Date: 2009-03-18 19:14+0000\n"
-"Last-Translator: Wieland Hoffmann <Unknown>\n"
-"Language-Team: German <de@li.org>\n"
+"PO-Revision-Date: 2009-06-13 12:56+0000\n"
+"Last-Translator: Juan Alfredo Salas Santillana <Unknown>\n"
+"Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,8 +19,8 @@ msgstr ""
 
 #: ../src/plugin.c:352
 msgid "Music root:"
-msgstr "Musik-Wurzelverzeichnis:"
+msgstr "Directorio Raiz de la musica:"
 
 #: ../src/plugin.c:388
 msgid "Music Dir Fetcher"
-msgstr ""
+msgstr "Directorio de obtencion de musica"
