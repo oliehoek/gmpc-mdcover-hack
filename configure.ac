@@ -17,7 +17,7 @@ AC_PROG_INTLTOOL([0.21])
 
 # i18n support
 dnl please keep them in alphabetical order
-ALL_LINGUAS="bs de fr nl pl ro ru sq sv zh_CN"
+ALL_LINGUAS="bs de es fr nl pl ro ru sq sv zh_CN"
 
 GETTEXT_PACKAGE=gmpc-mdcover
 AC_SUBST(GETTEXT_PACKAGE)
