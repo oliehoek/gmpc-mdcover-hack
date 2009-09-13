@@ -1,7 +1,7 @@
-AC_INIT([gmpc-mdcover], [0.18.102], [qball@sarine.nl])
+AC_INIT([gmpc-mdcover], [0.18.103], [qball@sarine.nl])
 m4_define([package_major_version], [0])
 m4_define([package_minor_version], [18])
-m4_define([package_micro_version], [102])
+m4_define([package_micro_version], [103])
 m4_define([package_version],[package_major_version.package_minor_version.package_micro_version])
 
 AC_CONFIG_AUX_DIR([.])
