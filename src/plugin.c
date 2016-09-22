@@ -234,6 +234,7 @@ void fetch_cover_art_path_list_from_dir(gchar *url, GList **list)
 		{
 			filename = g_dir_read_name(dir);
 			do{
+                /*debug_printf(DEBUG_INFO, "FAO: checking if filename '%s' is an image", filename);*/
 				/* ignore . files */
 				if(filename[0] != '.' || !strncmp(filename, ".folder.jpg",strlen(".folder.jpg")))
 				{
@@ -253,9 +254,14 @@ void fetch_cover_art_path_list_from_dir(gchar *url, GList **list)
 				filename = g_dir_read_name(dir);
 			}while(filename);
 		}
+        else
+            debug_printf(DEBUG_WARNING, "FAO: fetch_cover_art_path_list_from_dir regcomp failed?");
+
 		regfree(&regt);
 		g_dir_close(dir);
 	}
+    else
+        debug_printf(DEBUG_INFO, "fetch_cover_art_path_list_from_dir: could not open dir=%s", url);
 }
 GList * fetch_cover_art_path_list(mpd_Song *song) 
 {
@@ -283,6 +289,21 @@ GList * fetch_cover_art_path_list(mpd_Song *song)
 		debug_printf(DEBUG_WARNING, "No Music Root");
 		return NULL;
 	}
+    else if(strcmp(musicroot,"")==0)
+    {
+        /*this happens when mpd is remote...
+         * (this plugin lives locally...)
+         * I am sure there must be a better way, but let me just hack in a way to access
+         * the music location locally, via an environment var:
+         * ?*/
+        /*   musicroot = "/home/frans/links/mpdlocs/"; */
+        const char* musicroot_from_env = getenv("MPDLOCS");
+        musicroot = musicroot_from_env;
+        debug_printf(DEBUG_INFO, "FAO: set music root to ='%s'", musicroot);
+    }
+    else
+        debug_printf(DEBUG_INFO, "FAO: music root='%s'", musicroot);
+
 	dirname = g_path_get_dirname(song->file);
 	if(dirname == NULL)
 	{
@@ -293,7 +314,9 @@ GList * fetch_cover_art_path_list(mpd_Song *song)
 	{
 		int i = 0;
 		char *album = g_strdup(song->album);
-		for(i=0;i<strlen(album);i++) if(album[i] == G_DIR_SEPARATOR) album[i] = ' ';
+		for(i=0;i<strlen(album);i++) 
+            if(album[i] == G_DIR_SEPARATOR) 
+                album[i] = ' ';
 		/* Test the default "Remco" standard */	
 		url = g_strdup_printf("%s%c%s%c%s.jpg",
 				musicroot,
@@ -303,6 +326,7 @@ GList * fetch_cover_art_path_list(mpd_Song *song)
 				album
 				);
 		g_free(album);
+        /*debug_printf(DEBUG_INFO, "FAO: testing presence of url=%s", url);*/
 		if(g_file_test(url, G_FILE_TEST_EXISTS))
 		{
             MetaData *md = meta_data_new();
